@@ -22,6 +22,10 @@ export default function RootLayout() {
           <Stack.Screen name="comunicados/[id]" options={{ title: 'Comunicado' }} />
           <Stack.Screen name="comunicados/gerenciar" options={{ title: 'Gerenciar comunicados' }} />
           <Stack.Screen name="comunicados/formulario" options={{ title: 'Comunicado' }} />
+          <Stack.Screen name="categorias/index" options={{ title: 'Categorias de ocorrências' }} />
+          <Stack.Screen name="categorias/formulario" options={{ title: 'Categoria' }} />
+          <Stack.Screen name="ocorrencias/index" options={{ title: 'Ocorrências' }} />
+          <Stack.Screen name="ocorrencias/formulario" options={{ title: 'Nova ocorrência' }} />
           <Stack.Screen name="sobre" options={{ title: 'Sobre o projeto' }} />
           <Stack.Screen name="equipe" options={{ title: 'Equipe' }} />
         </Stack>

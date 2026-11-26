@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import {
   ActivityIndicator,
   FlatList,
@@ -6,7 +7,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { Card, Text } from 'react-native-paper';
+import { Button, Card, Text } from 'react-native-paper';
 
 import {
   formatarStatusOcorrencia,
@@ -38,6 +39,17 @@ export default function OcorrenciasScreen() {
         <Text variant="bodyLarge" style={styles.message}>
           {mensagemDeErroOcorrencia(ocorrencias.error)}
         </Text>
+        <Button mode="contained" onPress={() => ocorrencias.refetch()}>
+          Tentar novamente
+        </Button>
+      </View>
+    );
+  }
+
+  if (!ocorrencias.data) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -54,6 +66,11 @@ export default function OcorrenciasScreen() {
           <Text variant="bodyMedium" style={styles.descricao}>
             {item.descricao}
           </Text>
+          {item.categoria_nome && (
+            <Text variant="bodySmall" style={styles.categoria}>
+              Categoria: {item.categoria_nome}
+            </Text>
+          )}
 
           <View style={styles.statusContainer}>
             <Text variant="labelMedium" style={styles.status}>
@@ -72,12 +89,19 @@ export default function OcorrenciasScreen() {
   // Listagem
   return (
     <View style={styles.container}>
+      <Button
+        mode="contained"
+        style={styles.nova}
+        onPress={() => router.push('/ocorrencias/formulario')}
+      >
+        Nova ocorrência
+      </Button>
       <FlatList
-        data={ocorrencias.data}
+        data={ocorrencias.data.ocorrencias}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderOcorrencia}
         contentContainerStyle={
-          ocorrencias.data.length === 0
+          ocorrencias.data.ocorrencias.length === 0
             ? styles.emptyContainer
             : styles.list
         }
@@ -103,6 +127,10 @@ export default function OcorrenciasScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  nova: {
+    margin: 16,
+    marginBottom: 0,
   },
   center: {
     flex: 1,
@@ -132,6 +160,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   descricao: {
+    color: '#526579',
+  },
+  categoria: {
     color: '#526579',
   },
   statusContainer: {
