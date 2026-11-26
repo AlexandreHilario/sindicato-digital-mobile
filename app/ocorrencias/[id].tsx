@@ -1,5 +1,5 @@
 
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   useQuery,
   useMutation,
@@ -8,6 +8,7 @@ import {
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   View,
@@ -18,6 +19,7 @@ import {
   buscarOcorrencia,
   atualizarOcorrencia,
   atualizarStatusOcorrencia,
+  excluirOcorrencia,
   formatarStatusOcorrencia,
   mensagemDeErroOcorrencia,
   type StatusOcorrencia,
@@ -30,6 +32,7 @@ import {
 
 export default function DetalhesOcorrenciaScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   // Usuário e permissões
@@ -93,6 +96,27 @@ export default function DetalhesOcorrenciaScreen() {
 
       setStatusSelecionado(null);
       setMensagem('Status atualizado com sucesso!');
+    },
+  });
+
+  // Mutation para excluir ocorrência
+  const excluirMutation = useMutation({
+    mutationFn: () => excluirOcorrencia(id),
+
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: ['ocorrencia', id],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['ocorrencias'],
+      });
+
+      router.replace('/ocorrencias');
+    },
+
+    onError: (error) => {
+      setMensagem(mensagemDeErroOcorrencia(error));
     },
   });
 
@@ -177,6 +201,28 @@ export default function DetalhesOcorrenciaScreen() {
 
     setMensagem('');
     statusMutation.mutate();
+  }
+
+  // Confirmar exclusão
+  function confirmarExclusao() {
+    Alert.alert(
+      'Excluir ocorrência',
+      'Tem certeza de que deseja excluir esta ocorrência? Essa ação não poderá ser desfeita.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: () => {
+            setMensagem('');
+            excluirMutation.mutate();
+          },
+        },
+      ],
+    );
   }
 
   // Status disponíveis
@@ -334,7 +380,9 @@ export default function DetalhesOcorrenciaScreen() {
               {mensagem !== '' && (
                 <Text
                   style={
-                    statusMutation.isError || mutation.isError
+                    statusMutation.isError ||
+                    mutation.isError ||
+                    excluirMutation.isError
                       ? styles.error
                       : styles.success
                   }
@@ -350,6 +398,22 @@ export default function DetalhesOcorrenciaScreen() {
               >
                 Editar ocorrência
               </Button>
+
+              {/* Exclusão da ocorrência */}
+              {podeAlterarStatus && (
+                <Button
+                  mode="outlined"
+                  buttonColor="#b3261e"
+                  textColor="#b3261e"
+                  icon="delete"
+                  onPress={confirmarExclusao}
+                  loading={excluirMutation.isPending}
+                  disabled={excluirMutation.isPending}
+                  style={styles.button}
+                >
+                  Excluir ocorrência
+                </Button>
+              )}
             </>
           )}
         </Card.Content>
