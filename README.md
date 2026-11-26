@@ -1,8 +1,8 @@
 # Sindicato Digital Mobile
 
-Aplicativo mobile em React Native + Expo. O repositório contém apenas a
-configuração inicial e telas de navegação demonstrativas; CRUD, autenticação e
-integração real com o backend ainda não foram implementados.
+Aplicativo mobile em React Native + Expo, integrado ao backend Express do
+SíndicoDigital. Login, sessão e logout já funcionam; as telas de CRUD ainda
+não foram implementadas.
 
 O owner Expo está configurado como `anacsilvabrs-team`, seguindo os projetos
 existentes em `PDmobile2026`. O `projectId` será criado ao vincular este app
@@ -51,9 +51,36 @@ EXPO_PUBLIC_API_URL=http://192.168.0.10:3000
    { "status": "ok", "message": "SindicoDigital API está funcionando" }
    ```
 
-3. Abra o app: o cartão **Conexão com a API**, na tela inicial, faz `GET /health`
-   e mostra o endereço usado e o resultado. Use **Testar novamente** depois de
-   corrigir a configuração.
+3. Abra o app: o cartão **Conexão com a API**, nas telas de login e inicial, faz
+   `GET /health` e mostra o endereço usado e o resultado. Use **Testar
+   novamente** depois de corrigir a configuração.
+
+## Autenticação
+
+| Ação | Endpoint | Onde |
+| --- | --- | --- |
+| Login | `POST /auth/login` (`email`, `senha`) → `token` e `usuario` | `app/login.tsx` |
+| Restaurar sessão | `GET /auth/me` ao abrir o app | `app/_layout.tsx` |
+| Logout | `POST /auth/logout` (revoga o token) | botão **Sair** em `app/index.tsx` |
+
+- **Token guardado com segurança** com `expo-secure-store` (Keystore no Android,
+  Keychain no iOS), em `src/services/token-storage.ts`. No `npm run web`, que
+  não tem SecureStore, usa `localStorage` apenas para testes.
+- **Envio do token:** o interceptor do Axios (`src/services/api.ts`) adiciona
+  `Authorization: Bearer <token>` em todas as requisições.
+- **Sessão:** a store Zustand (`src/store/session-store.ts`) guarda o status, o
+  token e o usuário. O `_layout.tsx` usa `Stack.Protected`: sem sessão, só a
+  tela de login fica acessível. Com sessão, só as telas internas.
+- **Token expirado ou revogado:** qualquer `401` em requisição autenticada
+  encerra a sessão e volta ao login com o aviso "Sua sessão expirou".
+- **Servidor inacessível ao abrir o app:** o token é mantido e aparecem as
+  opções **Tentar novamente** e **Entrar com outra conta**.
+- **Logout:** revoga o token no backend e apaga o token salvo, o usuário e o
+  cache do TanStack Query (dados da conta). Se o backend não responder, a
+  sessão local é limpa mesmo assim.
+
+Usuários de demonstração do backend (seed): `morador1@sindicodigital.test`,
+`sindica@sindicodigital.test`, `admin@sindicodigital.test`, senha `Demo@123`.
 
 ## Tratamento de erros da API
 
@@ -76,7 +103,8 @@ Nas telas, use `getErrorMessage(error)` para exibir o erro ao usuário.
 - TanStack Query Provider
 - Cliente Axios configurável pelo ambiente, com timeout e erros padronizados
 - Verificação de conexão com `GET /health` na tela inicial
-- Zustand com estado inicial de sessão
+- Login, restauração de sessão e logout integrados ao backend
+- Zustand com o estado da sessão e token salvo no `expo-secure-store`
 - React Native Paper como UI Kit
 
 Os integrantes e respectivos RAs devem ser adicionados ao README antes da
