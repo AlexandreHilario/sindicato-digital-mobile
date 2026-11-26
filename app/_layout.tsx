@@ -61,6 +61,17 @@ export default function RootLayout() {
               <Stack.Screen name="ocorrencias/index" options={{ ...stackHeader, title: 'Ocorrências' }} />
               <Stack.Screen name="ocorrencias/[id]" options={{ ...stackHeader, title: 'Ocorrência' }} />
               <Stack.Screen name="ocorrencias/formulario" options={{ ...stackHeader, title: 'Nova ocorrência' }} />
+              <Stack.Screen name="unidades/index" options={{ ...stackHeader, title: 'Vínculos de moradores' }} />
+              <Stack.Screen
+                name="unidades/[unidadeId]/moradores"
+                options={{ ...stackHeader, title: 'Moradores da unidade' }}
+              />
+              <Stack.Screen name="unidades/minhas" options={{ ...stackHeader, title: 'Minhas unidades' }} />
+              <Stack.Screen name="sindicos/vinculos" options={{ ...stackHeader, title: 'Vínculos de síndicos' }} />
+              <Stack.Screen
+                name="sindicos/meus-condominios"
+                options={{ ...stackHeader, title: 'Meus condomínios' }}
+              />
             </Stack.Protected>
 
             {/* Quem não está logado só acessa o login */}

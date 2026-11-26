@@ -27,7 +27,11 @@ import { useUsuarioLogado } from '../../src/services/usuario';
 
 function rotuloUnidade(unidade: Unidade) {
   const condominio =
-    unidade.condominio_nome ?? unidade.condominio ?? `Condomínio ${unidade.condominio_id}`;
+    unidade.condominio_nome ??
+    (typeof unidade.condominio === 'string'
+      ? unidade.condominio
+      : unidade.condominio?.nome) ??
+    `Condomínio ${unidade.condominio_id}`;
   return `${condominio} • Bloco ${unidade.bloco} • Unidade ${unidade.numero}`;
 }
 
