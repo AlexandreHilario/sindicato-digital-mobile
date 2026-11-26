@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   FlatList,
@@ -16,6 +17,8 @@ import {
 } from '../../src/services/ocorrencias';
 
 export default function OcorrenciasScreen() {
+  const router = useRouter();
+
   const ocorrencias = useQuery({
     queryKey: ['ocorrencias'],
     queryFn: listarOcorrencias,
@@ -45,7 +48,15 @@ export default function OcorrenciasScreen() {
   // Renderização de cada ocorrência
   function renderOcorrencia({ item }: { item: Ocorrencia }) {
     return (
-      <Card style={styles.card}>
+      <Card
+        style={styles.card}
+        onPress={() =>
+          router.push({
+            pathname: '/ocorrencias/[id]',
+            params: { id: String(item.id) },
+          })
+        }
+      >
         <Card.Content style={styles.cardContent}>
           <Text variant="titleMedium" style={styles.titulo}>
             {item.titulo}
