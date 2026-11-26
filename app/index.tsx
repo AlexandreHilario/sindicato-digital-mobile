@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
+import { ApiStatus } from '../src/components/api-status';
 
 export default function HomeScreen() {
   return (
@@ -12,6 +13,7 @@ export default function HomeScreen() {
         Base inicial do aplicativo. As funcionalidades do projeto serão
         construídas pela equipe.
       </Text>
+      <ApiStatus />
       <Link href="/comunicados" asChild>
         <Button mode="contained">Mural de comunicados</Button>
       </Link>
