@@ -1,4 +1,4 @@
-# Sindicato Digital Mobile
+# SíndicoDigital Mobile
 
 Aplicativo mobile em React Native + Expo, integrado ao backend Express do
 SíndicoDigital. Login, sessão e logout já funcionam; as telas de CRUD ainda
