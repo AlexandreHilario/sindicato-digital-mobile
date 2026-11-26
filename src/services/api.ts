@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_ERROR_MESSAGES, ApiError, toApiError } from './api-error';
 
 import { useSessionStore } from '../store/session-store';
 
@@ -18,9 +19,18 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  if (!API_URL) {
+    throw new ApiError('config', API_ERROR_MESSAGES.config);
+  }
   const { accessToken } = useSessionStore.getState();
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
   return config;
 });
+
+// Todo erro que sai do cliente já vem como ApiError com mensagem padronizada.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(toApiError(error)),
+);
