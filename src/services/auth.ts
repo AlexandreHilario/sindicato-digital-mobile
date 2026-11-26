@@ -35,6 +35,15 @@ export async function getMe(token: string): Promise<Usuario> {
   return data;
 }
 
+/**
+ * GET /auth/me com o token da sessão atual (enviado pelo interceptor).
+ * Diferente de getMe, um 401 aqui encerra a sessão e volta ao login.
+ */
+export async function fetchCurrentUser(): Promise<Usuario> {
+  const { data } = await api.get<Usuario>('/auth/me');
+  return data;
+}
+
 /** POST /auth/logout — revoga o token no servidor (responde 204). */
 export async function logout(token: string): Promise<void> {
   // Sem corpo: enviar `null` como JSON faz o express.json() responder 400.
