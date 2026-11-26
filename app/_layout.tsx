@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Button, PaperProvider, Text } from 'react-native-paper';
 import { queryClient } from '../src/services/query-client';
 import { useSessionStore } from '../src/store/session-store';
+import { theme } from '../src/theme';
 
 export default function RootLayout() {
   const status = useSessionStore((state) => state.status);
@@ -18,7 +19,7 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PaperProvider>
+      <PaperProvider theme={theme}>
         <StatusBar style="dark" />
         {status === 'restoring' || status === 'restoreError' ? (
           <RestoringScreen />
