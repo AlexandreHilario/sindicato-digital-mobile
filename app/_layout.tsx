@@ -61,7 +61,7 @@ export default function RootLayout() {
               <Stack.Screen name="ocorrencias/index" options={{ ...stackHeader, title: 'Ocorrências' }} />
               <Stack.Screen name="ocorrencias/[id]" options={{ ...stackHeader, title: 'Ocorrência' }} />
               <Stack.Screen name="ocorrencias/formulario" options={{ ...stackHeader, title: 'Nova ocorrência' }} />
-              <Stack.Screen name="unidades/index" options={{ ...stackHeader, title: 'Vínculos de moradores' }} />
+              <Stack.Screen name="unidades/vinculos" options={{ ...stackHeader, title: 'Vínculos de moradores' }} />
               <Stack.Screen
                 name="unidades/[unidadeId]/moradores"
                 options={{ ...stackHeader, title: 'Moradores da unidade' }}
@@ -71,6 +71,11 @@ export default function RootLayout() {
               <Stack.Screen
                 name="sindicos/meus-condominios"
                 options={{ ...stackHeader, title: 'Meus condomínios' }}
+              />
+              <Stack.Screen name="apartamentos/index" options={{ ...stackHeader, title: 'Apartamentos' }} />
+              <Stack.Screen
+                name="apartamentos/formulario"
+                options={{ ...stackHeader, title: 'Apartamento' }}
               />
             </Stack.Protected>
 

@@ -2,17 +2,28 @@ import { isAxiosError } from 'axios';
 import { api } from './api';
 
 export type Condominio = {
-  id: number | string;
-  nome: string;
+  id?: number | string;
+  condominio_id?: number | string;
+  nome?: string;
+  condominio_nome?: string;
+  condominio?: {
+    id?: number | string;
+    nome?: string;
+  };
 };
 
-export async function listarMeusCondominios() {
+export async function listarMeusCondominios(): Promise<Condominio[]> {
   const { data } = await api.get<Condominio[]>('/sindicos/me/condominios');
   return data;
 }
+
+export async function listarCondominiosDoSindico(): Promise<Condominio[]> {
+  return listarMeusCondominios();
+}
+
 export async function associarSindico(
-  sindicoId: number,
-  condominioId: number,
+  sindicoId: number | string,
+  condominioId: number | string,
 ) {
   const { data } = await api.post(
     `/sindicos/${sindicoId}/condominios/${condominioId}`,
@@ -21,8 +32,8 @@ export async function associarSindico(
 }
 
 export async function desassociarSindico(
-  sindicoId: number,
-  condominioId: number,
+  sindicoId: number | string,
+  condominioId: number | string,
 ) {
   await api.delete(`/sindicos/${sindicoId}/condominios/${condominioId}`);
 }
@@ -44,6 +55,14 @@ export function mensagemDeErroSindico(error: unknown) {
           'Não foi possível concluir a operação.'
         );
     }
+  }
+
+  return 'Ocorreu um erro inesperado.';
+}
+
+export function mensagemDeErroCondominio(error: unknown) {
+  if (isAxiosError<{ message?: string }>(error)) {
+    return error.response?.data?.message ?? 'Não foi possível carregar os condomínios.';
   }
 
   return 'Ocorreu um erro inesperado.';

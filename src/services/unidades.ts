@@ -49,7 +49,13 @@ export async function listarUnidadesParaOcorrencia(
 
   const condominios = await listarMeusCondominios();
   const condominiosPermitidos = new Set(
-    condominios.map((condominio) => String(condominio.id)),
+    condominios
+      .map(
+        (condominio) =>
+          condominio.id ?? condominio.condominio_id ?? condominio.condominio?.id,
+      )
+      .filter((id): id is number | string => id !== undefined)
+      .map(String),
   );
   return unidades.filter((unidade) =>
     condominiosPermitidos.has(String(unidade.condominio_id)),

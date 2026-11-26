@@ -45,6 +45,34 @@ const ocorrencias: MenuItem = {
   href: '/ocorrencias',
 };
 
+const categorias: MenuItem = {
+  title: 'Categorias de ocorrências',
+  description: 'Organize os tipos de ocorrência',
+  icon: 'tag-multiple-outline',
+  href: '/categorias',
+};
+
+const apartamentos: MenuItem = {
+  title: 'Apartamentos',
+  description: 'Gerencie apartamentos dos condomínios',
+  icon: 'home-city-outline',
+  href: '/apartamentos',
+};
+
+const vinculosMoradores: MenuItem = {
+  title: 'Vínculos de moradores',
+  description: 'Gerencie moradores associados às unidades',
+  icon: 'account-group-outline',
+  href: '/unidades/vinculos',
+};
+
+const vinculosSindicos: MenuItem = {
+  title: 'Vínculos de síndicos',
+  description: 'Associe síndicos aos condomínios',
+  icon: 'account-tie-outline',
+  href: '/sindicos/vinculos',
+};
+
 /**
  * Atalhos da tela inicial para cada tipo de conta. As abas inferiores ficam em
  * app/(app)/_layout.tsx e seguem as mesmas regras (Tabs.Protected).
@@ -68,9 +96,20 @@ export const MENU_POR_TIPO: Record<TipoUsuario, MenuItem[]> = {
       icon: 'office-building-outline',
       href: '/condominios',
     },
+    apartamentos,
+    vinculosMoradores,
+    categorias,
     mural,
     ocorrencias,
     perfil,
   ],
-  ADMIN: [mural, ocorrencias, perfil],
+  ADMIN: [
+    apartamentos,
+    vinculosMoradores,
+    vinculosSindicos,
+    categorias,
+    mural,
+    ocorrencias,
+    perfil,
+  ],
 };
