@@ -56,8 +56,11 @@ export default function RootLayout() {
                 options={{ ...stackHeader, title: 'Gerenciar comunicados' }}
               />
               <Stack.Screen name="comunicados/formulario" options={{ ...stackHeader, title: 'Comunicado' }} />
+              <Stack.Screen name="categorias/index" options={{ ...stackHeader, title: 'Categorias de ocorrências' }} />
+              <Stack.Screen name="categorias/formulario" options={{ ...stackHeader, title: 'Categoria' }} />
               <Stack.Screen name="ocorrencias/index" options={{ ...stackHeader, title: 'Ocorrências' }} />
               <Stack.Screen name="ocorrencias/[id]" options={{ ...stackHeader, title: 'Ocorrência' }} />
+              <Stack.Screen name="ocorrencias/formulario" options={{ ...stackHeader, title: 'Nova ocorrência' }} />
             </Stack.Protected>
 
             {/* Quem não está logado só acessa o login */}

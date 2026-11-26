@@ -26,7 +26,7 @@ export default function UnidadesScreen() {
     >
       <FlatList
         data={data}
-        keyExtractor={(unidade) => unidade.id}
+        keyExtractor={(unidade) => String(unidade.id)}
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl

@@ -1,16 +1,48 @@
 import { api } from './api';
+import { listarMeusCondominios } from './sindicos';
 
-/** Unidade vinculada ao morador, com o condomínio a que pertence. */
-export type UnidadeDoMorador = {
-  id: string;
+export type Unidade = {
+  id: number | string;
+  condominio_id: number | string;
   bloco: string;
   numero: string;
-  condominio_id: string;
-  condominio: string;
+  condominio?: string;
+  condominio_nome?: string;
 };
 
-/** GET /usuarios/me/unidades — somente MORADOR (outros tipos recebem 403). */
+export type UnidadeDoMorador = Unidade & { condominio: string };
+
 export async function getMinhasUnidades(): Promise<UnidadeDoMorador[]> {
   const { data } = await api.get<UnidadeDoMorador[]>('/usuarios/me/unidades');
   return data;
+}
+
+export async function listarMinhasUnidades(): Promise<Unidade[]> {
+  return getMinhasUnidades();
+}
+
+export async function listarUnidadesDeGestao() {
+  const { data } = await api.get<Unidade[]>('/apartamentos');
+  return data;
+}
+
+export async function listarUnidadesParaOcorrencia(
+  tipo: 'MORADOR' | 'SINDICO' | 'ADMIN',
+) {
+  if (tipo === 'MORADOR') {
+    return listarMinhasUnidades();
+  }
+
+  const unidades = await listarUnidadesDeGestao();
+  if (tipo === 'ADMIN') {
+    return unidades;
+  }
+
+  const condominios = await listarMeusCondominios();
+  const condominiosPermitidos = new Set(
+    condominios.map((condominio) => String(condominio.id)),
+  );
+  return unidades.filter((unidade) =>
+    condominiosPermitidos.has(String(unidade.condominio_id)),
+  );
 }
