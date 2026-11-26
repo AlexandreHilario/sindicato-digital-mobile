@@ -16,6 +16,11 @@ export async function buscarUsuarioLogado() {
   return data;
 }
 
+export async function listarUsuarios() {
+  const { data } = await api.get<Usuario[]>('/usuarios');
+  return data;
+}
+
 export function useUsuarioLogado() {
   const accessToken = useSessionStore((state) => state.accessToken);
 

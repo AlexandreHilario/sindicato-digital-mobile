@@ -22,6 +22,11 @@ export default function RootLayout() {
           <Stack.Screen name="comunicados/[id]" options={{ title: 'Comunicado' }} />
           <Stack.Screen name="comunicados/gerenciar" options={{ title: 'Gerenciar comunicados' }} />
           <Stack.Screen name="comunicados/formulario" options={{ title: 'Comunicado' }} />
+          <Stack.Screen name="unidades/index" options={{ title: 'Vínculos de moradores' }} />
+          <Stack.Screen name="unidades/[unidadeId]/moradores" options={{ title: 'Moradores da unidade' }} />
+          <Stack.Screen name="unidades/minhas" options={{ title: 'Minhas unidades' }} />
+          <Stack.Screen name="sindicos/vinculos" options={{ title: 'Vínculos de síndicos' }} />
+          <Stack.Screen name="sindicos/meus-condominios" options={{ title: 'Meus condomínios' }} />
           <Stack.Screen name="sobre" options={{ title: 'Sobre o projeto' }} />
           <Stack.Screen name="equipe" options={{ title: 'Equipe' }} />
         </Stack>
