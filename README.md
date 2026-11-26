@@ -51,9 +51,10 @@ EXPO_PUBLIC_API_URL=http://192.168.0.10:3000
    { "status": "ok", "message": "SindicoDigital API está funcionando" }
    ```
 
-3. Abra o app: o cartão **Conexão com a API**, nas telas de login e de perfil, faz
-   `GET /health` e mostra o endereço usado e o resultado. Use **Testar
-   novamente** depois de corrigir a configuração.
+3. Abra o app: a tela de login faz `GET /health` e, se o servidor não
+   responder, mostra o aviso **Sem conexão com o servidor** com o botão
+   **Tentar** (`src/components/connection-banner.tsx`). Quando a conexão está
+   ok, nenhum aviso aparece.
 
 ## Autenticação
 
@@ -101,6 +102,25 @@ Assim, a aba some do menu e também não abre pela URL.
   carregando, erro (com **Tentar novamente**) e lista vazia
   (`src/components/query-state.tsx`).
 
+## Identidade visual
+
+O nome do produto é **SíndicoDigital**, igual à documentação do backend.
+Cores, cantos e espaçamentos ficam em `src/theme.ts` (`palette`, `radius`,
+`spacing`) e no tema do React Native Paper. Use esses valores nas telas em vez
+de cores soltas.
+
+| Token | Cor | Uso |
+| --- | --- | --- |
+| `primary` | `#17324d` | Marca, cabeçalhos, botões principais |
+| `accent` | `#2f80c3` | Detalhes e destaques |
+| `background` | `#f4f6f9` | Fundo das telas |
+| `surface` | `#ffffff` | Cartões e campos |
+| `danger` | `#b3261e` | Erros e ação de sair |
+
+Componentes da marca, em `src/components/`: `BrandLogo` (símbolo + nome),
+`IconBadge` (ícone em quadrado arredondado) e `QueryState` (carregando, erro
+e vazio).
+
 Usuários de demonstração do backend (seed): `morador1@sindicodigital.test`,
 `sindica@sindicodigital.test`, `admin@sindicodigital.test`, senha `Demo@123`.
 
@@ -122,10 +142,9 @@ Nas telas, use `getErrorMessage(error)` para exibir o erro ao usuário.
 ## Base configurada
 
 - Expo Router com abas por tipo de conta (Início, Unidades/Condomínios, Perfil)
-  e as telas Sobre e Equipe
 - TanStack Query Provider
 - Cliente Axios configurável pelo ambiente, com timeout e erros padronizados
-- Verificação de conexão com `GET /health` na tela inicial
+- Verificação de conexão com `GET /health` na tela de login
 - Login, restauração de sessão e logout integrados ao backend
 - Zustand com o estado da sessão e token salvo no `expo-secure-store`
 - React Native Paper como UI Kit
