@@ -1,5 +1,10 @@
+
 import { useLocalSearchParams } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -12,37 +17,82 @@ import { Button, Card, Text, TextInput } from 'react-native-paper';
 import {
   buscarOcorrencia,
   atualizarOcorrencia,
+  atualizarStatusOcorrencia,
   formatarStatusOcorrencia,
   mensagemDeErroOcorrencia,
+  type StatusOcorrencia,
 } from '../../src/services/ocorrencias';
+
+import {
+  useUsuarioLogado,
+  podeGerenciar,
+} from '../../src/services/usuario';
 
 export default function DetalhesOcorrenciaScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
 
+  // Usuário e permissões
+  const usuario = useUsuarioLogado();
+  const podeAlterarStatus = podeGerenciar(usuario.data);
+
+  // Estados da tela
   const [editando, setEditando] = useState(false);
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [mensagem, setMensagem] = useState('');
+  const [statusSelecionado, setStatusSelecionado] =
+    useState<StatusOcorrencia | null>(null);
 
+  // Buscar ocorrência
   const ocorrencia = useQuery({
     queryKey: ['ocorrencia', id],
     queryFn: () => buscarOcorrencia(id),
     enabled: Boolean(id),
   });
 
+  // Mutation para editar ocorrência
   const mutation = useMutation({
     mutationFn: () =>
       atualizarOcorrencia(id, {
         titulo: titulo.trim(),
         descricao: descricao.trim(),
       }),
+
     onSuccess: (dadosAtualizados) => {
-      queryClient.setQueryData(['ocorrencia', id], dadosAtualizados);
-      queryClient.invalidateQueries({ queryKey: ['ocorrencias'] });
+      queryClient.setQueryData(
+        ['ocorrencia', id],
+        dadosAtualizados,
+      );
+
+      queryClient.invalidateQueries({
+        queryKey: ['ocorrencias'],
+      });
 
       setEditando(false);
       setMensagem('Ocorrência atualizada com sucesso!');
+    },
+  });
+
+  // Mutation para atualizar status
+  const statusMutation = useMutation({
+    mutationFn: () =>
+      atualizarStatusOcorrencia(id, {
+        status: statusSelecionado!,
+      }),
+
+    onSuccess: (dadosAtualizados) => {
+      queryClient.setQueryData(
+        ['ocorrencia', id],
+        dadosAtualizados,
+      );
+
+      queryClient.invalidateQueries({
+        queryKey: ['ocorrencias'],
+      });
+
+      setStatusSelecionado(null);
+      setMensagem('Status atualizado com sucesso!');
     },
   });
 
@@ -98,7 +148,7 @@ export default function DetalhesOcorrenciaScreen() {
     setEditando(false);
   }
 
-  // Validar campos
+  // Salvar edição
   function salvarEdicao() {
     if (!titulo.trim() || !descricao.trim()) {
       setMensagem('Preencha o título e a descrição.');
@@ -108,6 +158,33 @@ export default function DetalhesOcorrenciaScreen() {
     setMensagem('');
     mutation.mutate();
   }
+
+  // Selecionar status
+  function selecionarStatus(status: StatusOcorrencia) {
+    setStatusSelecionado(status);
+    setMensagem('');
+    statusMutation.reset();
+  }
+
+  // Salvar status
+  function salvarStatus() {
+    const statusAtual = statusSelecionado ?? item.status;
+
+    if (statusAtual === item.status) {
+      setMensagem('A ocorrência já está com esse status.');
+      return;
+    }
+
+    setMensagem('');
+    statusMutation.mutate();
+  }
+
+  // Status disponíveis
+  const statusDisponiveis: StatusOcorrencia[] = [
+    'ABERTA',
+    'EM_ANDAMENTO',
+    'CONCLUIDA',
+  ];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -174,7 +251,7 @@ export default function DetalhesOcorrenciaScreen() {
 
               <View style={styles.statusContainer}>
                 <Text variant="labelLarge" style={styles.status}>
-                  {formatarStatusOcorrencia(item.status)}
+                  Status: {formatarStatusOcorrencia(item.status)}
                 </Text>
               </View>
 
@@ -207,8 +284,63 @@ export default function DetalhesOcorrenciaScreen() {
                 {new Date(item.atualizado_em).toLocaleString('pt-BR')}
               </Text>
 
+              {/* Gerenciamento de status */}
+              {podeAlterarStatus && (
+                <>
+                  <View style={styles.divider} />
+
+                  <Text variant="titleMedium" style={styles.sectionTitle}>
+                    Gerenciar status
+                  </Text>
+
+                  <Text variant="bodyMedium" style={styles.message}>
+                    Selecione o novo status da ocorrência:
+                  </Text>
+
+                  {statusDisponiveis.map((status) => (
+                    <Button
+                      key={status}
+                      mode={
+                        (statusSelecionado ?? item.status) === status
+                          ? 'contained'
+                          : 'outlined'
+                      }
+                      onPress={() => selecionarStatus(status)}
+                      disabled={statusMutation.isPending}
+                      style={styles.statusButton}
+                    >
+                      {formatarStatusOcorrencia(status)}
+                    </Button>
+                  ))}
+
+                  {statusMutation.isError && (
+                    <Text style={styles.error}>
+                      {mensagemDeErroOcorrencia(statusMutation.error)}
+                    </Text>
+                  )}
+
+                  <Button
+                    mode="contained"
+                    onPress={salvarStatus}
+                    loading={statusMutation.isPending}
+                    disabled={statusMutation.isPending}
+                    style={styles.button}
+                  >
+                    Salvar status
+                  </Button>
+                </>
+              )}
+
               {mensagem !== '' && (
-                <Text style={styles.success}>{mensagem}</Text>
+                <Text
+                  style={
+                    statusMutation.isError || mutation.isError
+                      ? styles.error
+                      : styles.success
+                  }
+                >
+                  {mensagem}
+                </Text>
               )}
 
               <Button
@@ -231,6 +363,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
   },
+
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -238,16 +371,20 @@ const styles = StyleSheet.create({
     gap: 16,
     padding: 24,
   },
+
   card: {
     borderRadius: 12,
   },
+
   content: {
     gap: 16,
   },
+
   titulo: {
     color: '#17324d',
     fontWeight: '700',
   },
+
   statusContainer: {
     backgroundColor: '#e8eef5',
     alignSelf: 'flex-start',
@@ -255,42 +392,57 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
+
   status: {
     color: '#17324d',
     fontWeight: '600',
   },
+
   sectionTitle: {
     color: '#17324d',
     fontWeight: '700',
   },
+
   descricao: {
     color: '#526579',
     lineHeight: 24,
   },
+
   divider: {
     height: 1,
     backgroundColor: '#e0e6ed',
   },
+
   info: {
     color: '#526579',
   },
+
   label: {
     fontWeight: '700',
     color: '#17324d',
   },
+
   input: {
     backgroundColor: '#fff',
   },
+
   button: {
     marginTop: 8,
   },
+
+  statusButton: {
+    marginTop: 4,
+  },
+
   error: {
     color: '#b3261e',
   },
+
   success: {
     color: '#267344',
     fontWeight: '600',
   },
+
   message: {
     color: '#526579',
     textAlign: 'center',
