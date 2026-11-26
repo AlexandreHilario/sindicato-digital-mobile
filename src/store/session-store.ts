@@ -29,6 +29,8 @@ type SessionState = {
   signOut: () => Promise<void>;
   expireSession: () => Promise<void>;
   clearNotice: () => void;
+  /** Atualiza os dados do usuário (ex.: após GET /auth/me no perfil). */
+  setUsuario: (usuario: Usuario) => void;
 };
 
 /** Apaga token, usuário e todos os dados da conta em cache. */
@@ -105,6 +107,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   },
 
   clearNotice: () => set({ notice: null }),
+
+  setUsuario: (usuario) => {
+    if (get().status === 'authenticated') set({ usuario });
+  },
 }));
 
 // Qualquer 401 em requisição autenticada encerra a sessão e volta ao login.
