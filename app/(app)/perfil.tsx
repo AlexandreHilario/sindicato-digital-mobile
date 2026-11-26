@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Avatar, Button, Card, Divider, List, Text } from 'react-native-paper';
-import { ApiStatus } from '../../src/components/api-status';
 import { QueryState } from '../../src/components/query-state';
 import { TIPO_LABEL } from '../../src/navigation/menu';
 import { fetchCurrentUser } from '../../src/services/auth';
@@ -82,8 +81,6 @@ export default function PerfilScreen() {
               left={(props) => <List.Icon {...props} icon="calendar" />}
             />
           </Card>
-
-          <ApiStatus />
 
           <Button
             mode="outlined"

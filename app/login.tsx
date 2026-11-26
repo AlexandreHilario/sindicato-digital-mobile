@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Button, HelperText, Text, TextInput } from 'react-native-paper';
-import { ApiStatus } from '../src/components/api-status';
+import { ConnectionBanner } from '../src/components/connection-banner';
 import { getErrorMessage } from '../src/services/api-error';
 import { useSessionStore } from '../src/store/session-store';
 
@@ -44,6 +44,8 @@ export default function LoginScreen() {
         <Text variant="bodyLarge" style={styles.subtitle}>
           Entre com seu e-mail e senha.
         </Text>
+
+        <ConnectionBanner />
 
         {notice ? (
           <Text variant="bodyMedium" style={styles.notice}>
@@ -96,8 +98,6 @@ export default function LoginScreen() {
         >
           Entrar
         </Button>
-
-        <ApiStatus />
       </ScrollView>
     </KeyboardAvoidingView>
   );
