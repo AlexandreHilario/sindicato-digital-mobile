@@ -34,3 +34,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => Promise.reject(toApiError(error)),
 );
+
+export type HealthResponse = {
+  status: 'ok';
+  message: string;
+};
+
+/** GET /health — confirma que o app consegue alcançar o backend. */
+export async function checkHealth(): Promise<HealthResponse> {
+  const { data } = await api.get<HealthResponse>('/health', { timeout: 5000 });
+  return data;
+}
