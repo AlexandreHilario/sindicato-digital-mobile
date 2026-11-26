@@ -94,7 +94,13 @@ Assim, a aba some do menu e também não abre pela URL.
 | `ADMIN` | Início, Perfil | — |
 
 - **Início** (`app/(app)/index.tsx`): saudação e menu do tipo de conta,
-  definido em `src/navigation/menu.ts`.
+  definido em `src/navigation/menu.ts`. Todos os tipos de conta têm atalhos
+  para o **Mural de comunicados** e as **Ocorrências**.
+- **Mural e Ocorrências** (`app/comunicados/` e `app/ocorrencias/`): abrem
+  empilhadas sobre as abas, com cabeçalho e botão de voltar, e também ficam
+  dentro do `Stack.Protected`, ou seja, só abrem com login. O que cada tipo de
+  conta pode fazer nelas é definido nas próprias telas (por exemplo,
+  **Gerenciar comunicados** só para síndico e administrador) e no backend.
 - **Perfil** (`app/(app)/perfil.tsx`): nome, e-mail, tipo de conta e data de
   cadastro, sempre buscados com `GET /auth/me`. Também tem o botão **Sair da
   conta**.
