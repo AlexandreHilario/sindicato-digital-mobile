@@ -31,9 +31,9 @@ export default function RootLayout() {
               contentStyle: { backgroundColor: '#f5f7fa' },
             }}
           >
-            {/* Telas que exigem login */}
+            {/* Telas que exigem login: abas em (app)/ e telas empilhadas */}
             <Stack.Protected guard={status === 'authenticated'}>
-              <Stack.Screen name="index" options={{ title: 'Início' }} />
+              <Stack.Screen name="(app)" options={{ headerShown: false }} />
               <Stack.Screen name="comunicados/index" options={{ title: 'Mural' }} />
               <Stack.Screen name="comunicados/[id]" options={{ title: 'Comunicado' }} />
               <Stack.Screen name="comunicados/gerenciar" options={{ title: 'Gerenciar comunicados' }} />
