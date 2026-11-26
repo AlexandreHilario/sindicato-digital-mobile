@@ -66,6 +66,16 @@ export default function OcorrenciasScreen() {
             {item.descricao}
           </Text>
 
+          <Text variant="bodySmall" style={styles.metadata}>
+            Categoria: {item.categoria_nome ?? '—'}
+          </Text>
+          <Text variant="bodySmall" style={styles.metadata}>
+            {[
+              item.bloco ? `Bloco ${item.bloco}` : null,
+              item.unidade_numero ? `Unidade ${item.unidade_numero}` : null,
+            ].filter(Boolean).join(', ') || 'Unidade não informada'}
+          </Text>
+
           <View style={styles.statusContainer}>
             <Text variant="labelMedium" style={styles.status}>
               Status: {formatarStatusOcorrencia(item.status)}
@@ -144,6 +154,9 @@ const styles = StyleSheet.create({
   },
   descricao: {
     color: '#526579',
+  },
+  metadata: {
+    color: '#7a8794',
   },
   statusContainer: {
     backgroundColor: '#e8eef5',

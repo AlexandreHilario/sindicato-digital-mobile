@@ -11,6 +11,9 @@ export type Ocorrencia = {
   status: StatusOcorrencia;
   usuario_id: string | number;
   unidade_id: string | number;
+  categoria_nome?: string;
+  bloco?: string | null;
+  unidade_numero?: string | number | null;
   criado_em: string;
   atualizado_em: string;
 };

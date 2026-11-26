@@ -63,9 +63,9 @@ export default function DetalhesOcorrenciaScreen() {
       }),
 
     onSuccess: (dadosAtualizados) => {
-      queryClient.setQueryData(
+      queryClient.setQueryData<NonNullable<typeof ocorrencia.data>>(
         ['ocorrencia', id],
-        dadosAtualizados,
+        (atual) => ({ ...atual, ...dadosAtualizados }),
       );
 
       queryClient.invalidateQueries({
@@ -85,9 +85,9 @@ export default function DetalhesOcorrenciaScreen() {
       }),
 
     onSuccess: (dadosAtualizados) => {
-      queryClient.setQueryData(
+      queryClient.setQueryData<NonNullable<typeof ocorrencia.data>>(
         ['ocorrencia', id],
-        dadosAtualizados,
+        (atual) => ({ ...atual, ...dadosAtualizados }),
       );
 
       queryClient.invalidateQueries({
@@ -318,6 +318,19 @@ export default function DetalhesOcorrenciaScreen() {
               <Text variant="bodyMedium" style={styles.info}>
                 <Text style={styles.label}>ID: </Text>
                 {item.id}
+              </Text>
+
+              <Text variant="bodyMedium" style={styles.info}>
+                <Text style={styles.label}>Categoria: </Text>
+                {item.categoria_nome ?? '—'}
+              </Text>
+
+              <Text variant="bodyMedium" style={styles.info}>
+                <Text style={styles.label}>Unidade: </Text>
+                {[
+                  item.bloco ? `Bloco ${item.bloco}` : null,
+                  item.unidade_numero ? `Unidade ${item.unidade_numero}` : null,
+                ].filter(Boolean).join(', ') || '—'}
               </Text>
 
               <Text variant="bodyMedium" style={styles.info}>
