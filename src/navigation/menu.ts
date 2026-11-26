@@ -34,14 +34,14 @@ const perfil: MenuItem = {
 const mural: MenuItem = {
   title: 'Mural de comunicados',
   description: 'Avisos do condomínio',
-  icon: 'bullhorn',
+  icon: 'bullhorn-outline',
   href: '/comunicados',
 };
 
 const ocorrencias: MenuItem = {
   title: 'Ocorrências',
   description: 'Problemas registrados no condomínio',
-  icon: 'clipboard-alert',
+  icon: 'clipboard-alert-outline',
   href: '/ocorrencias',
 };
 
