@@ -1,9 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router/tabs';
 import type { ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { IconName } from '../../src/navigation/menu';
 import { useSessionStore } from '../../src/store/session-store';
 import { palette } from '../../src/theme';
+
+const TAB_BAR_HEIGHT = 68;
 
 function tabIcon(name: IconName, focusedName: IconName) {
   return ({ color, size, focused }: { color: ColorValue; size: number; focused: boolean }) => (
@@ -22,6 +25,7 @@ function tabIcon(name: IconName, focusedName: IconName) {
  */
 export default function AppTabsLayout() {
   const tipo = useSessionStore((state) => state.usuario?.tipo);
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -38,8 +42,14 @@ export default function AppTabsLayout() {
         sceneStyle: { backgroundColor: palette.background },
         tabBarActiveTintColor: palette.primary,
         tabBarInactiveTintColor: '#8796a6',
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 12, lineHeight: 16, fontWeight: '600' },
+        // Altura explícita: na padrão, cada aba fica com ~37px úteis e o texto
+        // (ícone 25px + rótulo 16px) é esmagado e cortado. A área segura
+        // inferior (barra de gestos do celular) é somada à altura.
         tabBarStyle: {
+          height: TAB_BAR_HEIGHT + insets.bottom,
+          paddingTop: 6,
+          paddingBottom: insets.bottom + 6,
           backgroundColor: palette.surface,
           borderTopColor: palette.border,
         },
