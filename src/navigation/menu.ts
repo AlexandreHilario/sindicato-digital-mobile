@@ -39,20 +39,6 @@ const ocorrencias: MenuItem = {
   href: '/ocorrencias',
 };
 
-const sobre: MenuItem = {
-  title: 'Sobre o projeto',
-  description: 'Propósito do aplicativo',
-  icon: 'information',
-  href: '/sobre',
-};
-
-const equipe: MenuItem = {
-  title: 'Equipe',
-  description: 'Integrantes do projeto',
-  icon: 'account-group',
-  href: '/equipe',
-};
-
 /**
  * Menu da tela inicial para cada tipo de conta. As abas inferiores ficam em
  * app/(app)/_layout.tsx e usam as mesmas regras (Tabs.Protected).
@@ -68,8 +54,6 @@ export const MENU_POR_TIPO: Record<TipoUsuario, MenuItem[]> = {
     mural,
     ocorrencias,
     perfil,
-    sobre,
-    equipe,
   ],
   SINDICO: [
     {
@@ -81,8 +65,6 @@ export const MENU_POR_TIPO: Record<TipoUsuario, MenuItem[]> = {
     mural,
     ocorrencias,
     perfil,
-    sobre,
-    equipe,
   ],
-  ADMIN: [mural, ocorrencias, perfil, sobre, equipe],
+  ADMIN: [mural, ocorrencias, perfil],
 };
