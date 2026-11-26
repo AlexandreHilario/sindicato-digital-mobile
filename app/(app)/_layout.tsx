@@ -1,7 +1,9 @@
+
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router/tabs';
 import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import type { IconName } from '../../src/navigation/menu';
 import { useSessionStore } from '../../src/store/session-store';
 import { palette } from '../../src/theme';
@@ -9,7 +11,15 @@ import { palette } from '../../src/theme';
 const TAB_BAR_HEIGHT = 68;
 
 function tabIcon(name: IconName, focusedName: IconName) {
-  return ({ color, size, focused }: { color: ColorValue; size: number; focused: boolean }) => (
+  return ({
+    color,
+    size,
+    focused,
+  }: {
+    color: ColorValue;
+    size: number;
+    focused: boolean;
+  }) => (
     <MaterialCommunityIcons
       name={focused ? focusedName : name}
       color={typeof color === 'string' ? color : undefined}
@@ -19,9 +29,8 @@ function tabIcon(name: IconName, focusedName: IconName) {
 }
 
 /**
- * Abas da área logada. O _layout raiz já garante que só usuários logados
- * chegam aqui; o Tabs.Protected esconde (e bloqueia por URL) as abas que não
- * são do tipo de conta logado, voltando para "Início".
+ * Abas da área logada.
+ * O Tabs.Protected controla quais abas cada tipo de usuário pode acessar.
  */
 export default function AppTabsLayout() {
   const tipo = useSessionStore((state) => state.usuario?.tipo);
@@ -42,10 +51,11 @@ export default function AppTabsLayout() {
         sceneStyle: { backgroundColor: palette.background },
         tabBarActiveTintColor: palette.primary,
         tabBarInactiveTintColor: '#8796a6',
-        tabBarLabelStyle: { fontSize: 12, lineHeight: 16, fontWeight: '600' },
-        // Altura explícita: na padrão, cada aba fica com ~37px úteis e o texto
-        // (ícone 25px + rótulo 16px) é esmagado e cortado. A área segura
-        // inferior (barra de gestos do celular) é somada à altura.
+        tabBarLabelStyle: {
+          fontSize: 12,
+          lineHeight: 16,
+          fontWeight: '600',
+        },
         tabBarStyle: {
           height: TAB_BAR_HEIGHT + insets.bottom,
           paddingTop: 6,
@@ -81,7 +91,26 @@ export default function AppTabsLayout() {
           options={{
             title: 'Meus condomínios',
             tabBarLabel: 'Condomínios',
-            tabBarIcon: tabIcon('office-building-outline', 'office-building'),
+            tabBarIcon: tabIcon(
+              'office-building-outline',
+              'office-building',
+            ),
+          }}
+        />
+      </Tabs.Protected>
+
+      <Tabs.Protected
+        guard={tipo === 'ADMIN' || tipo === 'SINDICO'}
+      >
+        <Tabs.Screen
+          name="usuarios"
+          options={{
+            title: 'Usuários',
+            tabBarLabel: 'Usuários',
+            tabBarIcon: tabIcon(
+              'account-group-outline',
+              'account-group',
+            ),
           }}
         />
       </Tabs.Protected>
@@ -91,7 +120,10 @@ export default function AppTabsLayout() {
         options={{
           title: 'Meu perfil',
           tabBarLabel: 'Perfil',
-          tabBarIcon: tabIcon('account-circle-outline', 'account-circle'),
+          tabBarIcon: tabIcon(
+            'account-circle-outline',
+            'account-circle',
+          ),
         }}
       />
     </Tabs>
