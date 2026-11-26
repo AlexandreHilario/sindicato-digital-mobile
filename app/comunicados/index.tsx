@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useNavigation } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { Button, Card, Text } from 'react-native-paper';
 
 import { formatarData, listarComunicados, mensagemDeErro } from '../../src/services/comunicados';
+import { podeGerenciar, useUsuarioLogado } from '../../src/services/usuario';
 
 export default function MuralScreen() {
   const { data, isPending, isError, error, refetch } = useQuery({
@@ -12,6 +13,21 @@ export default function MuralScreen() {
     queryFn: listarComunicados,
   });
   const [atualizando, setAtualizando] = useState(false);
+  const navigation = useNavigation();
+  const usuario = useUsuarioLogado();
+  const gerencia = podeGerenciar(usuario.data);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: gerencia
+        ? () => (
+            <Button compact onPress={() => router.push('/comunicados/gerenciar')}>
+              Gerenciar
+            </Button>
+          )
+        : undefined,
+    });
+  }, [gerencia, navigation]);
 
   async function atualizar() {
     setAtualizando(true);
