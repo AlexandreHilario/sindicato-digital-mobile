@@ -12,6 +12,9 @@ export default function HomeScreen() {
         Base inicial do aplicativo. As funcionalidades do projeto serão
         construídas pela equipe.
       </Text>
+      <Link href="/comunicados" asChild>
+        <Button mode="contained">Mural de comunicados</Button>
+      </Link>
       <Link href="/sobre" asChild>
         <Button mode="contained">Sobre o projeto</Button>
       </Link>
