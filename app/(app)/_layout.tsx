@@ -3,11 +3,12 @@ import { Tabs } from 'expo-router/tabs';
 import type { ColorValue } from 'react-native';
 import type { IconName } from '../../src/navigation/menu';
 import { useSessionStore } from '../../src/store/session-store';
+import { palette } from '../../src/theme';
 
-function tabIcon(name: IconName) {
-  return ({ color, size }: { color: ColorValue; size: number }) => (
+function tabIcon(name: IconName, focusedName: IconName) {
+  return ({ color, size, focused }: { color: ColorValue; size: number; focused: boolean }) => (
     <MaterialCommunityIcons
-      name={name}
+      name={focused ? focusedName : name}
       color={typeof color === 'string' ? color : undefined}
       size={size}
     />
@@ -15,7 +16,7 @@ function tabIcon(name: IconName) {
 }
 
 /**
- * Abas das telas internas. O _layout raiz já garante que só usuários logados
+ * Abas da área logada. O _layout raiz já garante que só usuários logados
  * chegam aqui; o Tabs.Protected esconde (e bloqueia por URL) as abas que não
  * são do tipo de conta logado, voltando para "Início".
  */
@@ -25,35 +26,63 @@ export default function AppTabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: '#f5f7fa' },
-        headerTintColor: '#17324d',
-        sceneStyle: { backgroundColor: '#f5f7fa' },
-        tabBarActiveTintColor: '#17324d',
-        tabBarInactiveTintColor: '#7a8a9a',
+        headerStyle: {
+          backgroundColor: palette.surface,
+          borderBottomWidth: 1,
+          borderBottomColor: palette.border,
+        },
+        headerShadowVisible: false,
+        headerTintColor: palette.text,
+        headerTitleStyle: { fontWeight: '700' },
+        headerTitleAlign: 'left',
+        sceneStyle: { backgroundColor: palette.background },
+        tabBarActiveTintColor: palette.primary,
+        tabBarInactiveTintColor: '#8796a6',
+        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarStyle: {
+          backgroundColor: palette.surface,
+          borderTopColor: palette.border,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Início', tabBarIcon: tabIcon('home') }}
+        options={{
+          title: 'Início',
+          headerShown: false,
+          tabBarIcon: tabIcon('home-outline', 'home'),
+        }}
       />
 
       <Tabs.Protected guard={tipo === 'MORADOR'}>
         <Tabs.Screen
           name="unidades"
-          options={{ title: 'Minhas unidades', tabBarLabel: 'Unidades', tabBarIcon: tabIcon('home-city') }}
+          options={{
+            title: 'Minhas unidades',
+            tabBarLabel: 'Unidades',
+            tabBarIcon: tabIcon('home-city-outline', 'home-city'),
+          }}
         />
       </Tabs.Protected>
 
       <Tabs.Protected guard={tipo === 'SINDICO'}>
         <Tabs.Screen
           name="condominios"
-          options={{ title: 'Meus condomínios', tabBarLabel: 'Condomínios', tabBarIcon: tabIcon('office-building') }}
+          options={{
+            title: 'Meus condomínios',
+            tabBarLabel: 'Condomínios',
+            tabBarIcon: tabIcon('office-building-outline', 'office-building'),
+          }}
         />
       </Tabs.Protected>
 
       <Tabs.Screen
         name="perfil"
-        options={{ title: 'Meu perfil', tabBarLabel: 'Perfil', tabBarIcon: tabIcon('account-circle') }}
+        options={{
+          title: 'Meu perfil',
+          tabBarLabel: 'Perfil',
+          tabBarIcon: tabIcon('account-circle-outline', 'account-circle'),
+        }}
       />
     </Tabs>
   );

@@ -6,9 +6,15 @@ import type { TipoUsuario } from '../services/auth';
 export type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 export const TIPO_LABEL: Record<TipoUsuario, string> = {
-  MORADOR: 'Morador(a)',
-  SINDICO: 'Síndico(a)',
-  ADMIN: 'Administrador(a)',
+  MORADOR: 'Morador',
+  SINDICO: 'Síndico',
+  ADMIN: 'Administrador',
+};
+
+export const TIPO_ICON: Record<TipoUsuario, IconName> = {
+  MORADOR: 'home-account',
+  SINDICO: 'account-tie',
+  ADMIN: 'shield-account',
 };
 
 export type MenuItem = {
@@ -20,8 +26,8 @@ export type MenuItem = {
 
 const perfil: MenuItem = {
   title: 'Meu perfil',
-  description: 'Nome, e-mail e tipo de conta',
-  icon: 'account-circle',
+  description: 'Seus dados e informações da conta',
+  icon: 'account-circle-outline',
   href: '/perfil',
 };
 
@@ -40,15 +46,15 @@ const ocorrencias: MenuItem = {
 };
 
 /**
- * Menu da tela inicial para cada tipo de conta. As abas inferiores ficam em
- * app/(app)/_layout.tsx e usam as mesmas regras (Tabs.Protected).
+ * Atalhos da tela inicial para cada tipo de conta. As abas inferiores ficam em
+ * app/(app)/_layout.tsx e seguem as mesmas regras (Tabs.Protected).
  */
 export const MENU_POR_TIPO: Record<TipoUsuario, MenuItem[]> = {
   MORADOR: [
     {
       title: 'Minhas unidades',
-      description: 'Apartamentos e condomínios vinculados a você',
-      icon: 'home-city',
+      description: 'Apartamentos vinculados à sua conta',
+      icon: 'home-city-outline',
       href: '/unidades',
     },
     mural,
@@ -58,8 +64,8 @@ export const MENU_POR_TIPO: Record<TipoUsuario, MenuItem[]> = {
   SINDICO: [
     {
       title: 'Meus condomínios',
-      description: 'Condomínios que você administra',
-      icon: 'office-building',
+      description: 'Condomínios sob sua administração',
+      icon: 'office-building-outline',
       href: '/condominios',
     },
     mural,

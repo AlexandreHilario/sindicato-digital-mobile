@@ -1,23 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { Avatar, Button, Card, Divider, List, Text } from 'react-native-paper';
+import { Avatar, Button, Text } from 'react-native-paper';
+import { IconBadge } from '../../src/components/icon-badge';
 import { QueryState } from '../../src/components/query-state';
-import { TIPO_LABEL } from '../../src/navigation/menu';
+import { TIPO_ICON, TIPO_LABEL, type IconName } from '../../src/navigation/menu';
 import { fetchCurrentUser } from '../../src/services/auth';
 import { useSessionStore } from '../../src/store/session-store';
-
-function iniciais(nome: string) {
-  const partes = nome.trim().split(/\s+/);
-  const primeira = partes[0]?.[0] ?? '';
-  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
-  return (primeira + ultima).toUpperCase();
-}
-
-function formatarData(iso: string) {
-  const data = new Date(iso);
-  return Number.isNaN(data.getTime()) ? '-' : data.toLocaleDateString('pt-BR');
-}
+import { palette, radius, spacing } from '../../src/theme';
+import { formatarData, iniciais } from '../../src/utils/formatters';
 
 export default function PerfilScreen() {
   const usuarioId = useSessionStore((state) => state.usuario?.id);
@@ -53,34 +44,48 @@ export default function PerfilScreen() {
       {usuario ? (
         <ScrollView
           contentContainerStyle={styles.container}
-          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={() => void refetch()}
+              tintColor={palette.primary}
+              colors={[palette.primary]}
+            />
+          }
         >
           <View style={styles.header}>
-            <Avatar.Text size={72} label={iniciais(usuario.nome)} style={styles.avatar} />
+            <Avatar.Text
+              size={88}
+              label={iniciais(usuario.nome)}
+              style={styles.avatar}
+              labelStyle={styles.avatarLabel}
+            />
             <Text variant="headlineSmall" style={styles.name}>
               {usuario.nome}
             </Text>
+            <Text variant="bodyMedium" style={styles.email}>
+              {TIPO_LABEL[usuario.tipo] ?? usuario.tipo}
+            </Text>
           </View>
 
-          <Card mode="outlined" style={styles.card}>
-            <List.Item
-              title="E-mail"
-              description={usuario.email}
-              left={(props) => <List.Icon {...props} icon="email-outline" />}
+          <Text variant="labelLarge" style={styles.sectionTitle}>
+            INFORMAÇÕES DA CONTA
+          </Text>
+          <View style={styles.card}>
+            <InfoRow icon="email-outline" label="E-mail" value={usuario.email} />
+            <View style={styles.divider} />
+            <InfoRow
+              icon={TIPO_ICON[usuario.tipo]}
+              label="Tipo de conta"
+              value={TIPO_LABEL[usuario.tipo] ?? usuario.tipo}
             />
-            <Divider />
-            <List.Item
-              title="Tipo de conta"
-              description={TIPO_LABEL[usuario.tipo] ?? usuario.tipo}
-              left={(props) => <List.Icon {...props} icon="badge-account" />}
+            <View style={styles.divider} />
+            <InfoRow
+              icon="calendar-blank-outline"
+              label="Membro desde"
+              value={formatarData(usuario.criado_em)}
             />
-            <Divider />
-            <List.Item
-              title="Membro desde"
-              description={formatarData(usuario.criado_em)}
-              left={(props) => <List.Icon {...props} icon="calendar" />}
-            />
-          </Card>
+          </View>
 
           <Button
             mode="outlined"
@@ -88,8 +93,9 @@ export default function PerfilScreen() {
             onPress={handleSignOut}
             loading={signingOut}
             disabled={signingOut}
-            textColor="#b3261e"
+            textColor={palette.danger}
             style={styles.logout}
+            contentStyle={styles.logoutContent}
           >
             Sair da conta
           </Button>
@@ -99,28 +105,86 @@ export default function PerfilScreen() {
   );
 }
 
+function InfoRow({ icon, label, value }: { icon: IconName; label: string; value: string }) {
+  return (
+    <View style={styles.row}>
+      <IconBadge icon={icon} size={40} />
+      <View style={styles.rowTexts}>
+        <Text variant="bodySmall" style={styles.rowLabel}>
+          {label}
+        </Text>
+        <Text variant="bodyLarge" style={styles.rowValue}>
+          {value}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
-    gap: 16,
-    padding: 24,
+    padding: spacing.lg,
+    gap: spacing.md,
   },
   header: {
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 8,
+    gap: spacing.xs,
+    paddingVertical: spacing.md,
   },
   avatar: {
-    backgroundColor: '#17324d',
+    backgroundColor: palette.primary,
+    marginBottom: spacing.sm,
+  },
+  avatarLabel: {
+    fontWeight: '700',
   },
   name: {
-    color: '#17324d',
+    color: palette.text,
     fontWeight: '700',
     textAlign: 'center',
   },
+  email: {
+    color: palette.textMuted,
+  },
+  sectionTitle: {
+    color: palette.textMuted,
+    letterSpacing: 0.8,
+    marginTop: spacing.sm,
+  },
   card: {
-    backgroundColor: '#ffffff',
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: 14,
+  },
+  rowTexts: {
+    flex: 1,
+  },
+  rowLabel: {
+    color: palette.textMuted,
+  },
+  rowValue: {
+    color: palette.text,
+    fontWeight: '500',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: palette.border,
+    marginLeft: 56,
   },
   logout: {
-    borderColor: '#b3261e',
+    marginTop: spacing.md,
+    borderRadius: radius.md,
+    borderColor: palette.danger,
+  },
+  logoutContent: {
+    height: 48,
   },
 });
