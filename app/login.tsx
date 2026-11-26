@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
-import { Button, HelperText, Text, TextInput } from 'react-native-paper';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Button, HelperText, Icon, Text, TextInput } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BrandLogo } from '../src/components/brand-logo';
 import { ConnectionBanner } from '../src/components/connection-banner';
 import { getErrorMessage } from '../src/services/api-error';
 import { useSessionStore } from '../src/store/session-store';
+import { palette, radius, spacing } from '../src/theme';
 
 export default function LoginScreen() {
+  const insets = useSafeAreaInsets();
   const signIn = useSessionStore((state) => state.signIn);
   const notice = useSessionStore((state) => state.notice);
   const clearNotice = useSessionStore((state) => state.clearNotice);
@@ -25,7 +29,7 @@ export default function LoginScreen() {
     clearNotice();
     try {
       await signIn(email, senha);
-      // Sucesso: o Stack.Protected do _layout troca para a tela inicial.
+      // Sucesso: o Stack.Protected do _layout troca para a área logada.
     } catch (err) {
       setError(getErrorMessage(err));
       setSubmitting(false);
@@ -37,67 +41,97 @@ export default function LoginScreen() {
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Text variant="headlineMedium" style={styles.title}>
-          Sindicato Digital
-        </Text>
-        <Text variant="bodyLarge" style={styles.subtitle}>
-          Entre com seu e-mail e senha.
-        </Text>
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + spacing.lg }]}
+        keyboardShouldPersistTaps="handled"
+        bounces={false}
+      >
+        <View style={[styles.hero, { paddingTop: insets.top + spacing.xl * 1.5 }]}>
+          <BrandLogo variant="light" size="lg" showTagline />
+        </View>
 
-        <ConnectionBanner />
-
-        {notice ? (
-          <Text variant="bodyMedium" style={styles.notice}>
-            {notice}
+        <View style={styles.cardWrapper}>
+        <View style={styles.card}>
+          <Text variant="headlineSmall" style={styles.title}>
+            Bem-vindo
           </Text>
-        ) : null}
+          <Text variant="bodyMedium" style={styles.subtitle}>
+            Entre com sua conta para continuar.
+          </Text>
 
-        <TextInput
-          label="E-mail"
-          mode="outlined"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          autoComplete="email"
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          returnKeyType="next"
-          disabled={submitting}
-        />
-        <TextInput
-          label="Senha"
-          mode="outlined"
-          value={senha}
-          onChangeText={setSenha}
-          secureTextEntry={!showPassword}
-          autoCapitalize="none"
-          autoComplete="password"
-          textContentType="password"
-          returnKeyType="done"
-          onSubmitEditing={handleSubmit}
-          disabled={submitting}
-          right={
-            <TextInput.Icon
-              icon={showPassword ? 'eye-off' : 'eye'}
-              onPress={() => setShowPassword((value) => !value)}
-              accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-            />
-          }
-        />
+          <ConnectionBanner />
 
-        <HelperText type="error" visible={!!error}>
-          {error}
-        </HelperText>
+          {notice ? (
+            <View style={styles.notice}>
+              <Icon source="clock-alert-outline" size={20} color={palette.warning} />
+              <Text variant="bodyMedium" style={styles.noticeText}>
+                {notice}
+              </Text>
+            </View>
+          ) : null}
 
-        <Button
-          mode="contained"
-          onPress={handleSubmit}
-          loading={submitting}
-          disabled={!canSubmit}
-        >
-          Entrar
-        </Button>
+          <TextInput
+            label="E-mail"
+            mode="outlined"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoComplete="email"
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            returnKeyType="next"
+            disabled={submitting}
+            left={<TextInput.Icon icon="email-outline" color={palette.textMuted} />}
+            outlineStyle={styles.inputOutline}
+          />
+          <TextInput
+            label="Senha"
+            mode="outlined"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry={!showPassword}
+            autoCapitalize="none"
+            autoComplete="password"
+            textContentType="password"
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit}
+            disabled={submitting}
+            outlineStyle={styles.inputOutline}
+            left={<TextInput.Icon icon="lock-outline" color={palette.textMuted} />}
+            right={
+              <TextInput.Icon
+                icon={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                color={palette.textMuted}
+                onPress={() => setShowPassword((value) => !value)}
+                accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              />
+            }
+          />
+
+          {error ? (
+            <HelperText type="error" visible style={styles.error}>
+              {error}
+            </HelperText>
+          ) : null}
+
+          <Button
+            mode="contained"
+            onPress={handleSubmit}
+            loading={submitting}
+            disabled={!canSubmit}
+            style={styles.button}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+          >
+            Entrar
+          </Button>
+        </View>
+        </View>
+
+        <Text variant="bodySmall" style={styles.footer}>
+          © {new Date().getFullYear()} SíndicoDigital
+        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -106,26 +140,82 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
-    backgroundColor: '#f5f7fa',
+    backgroundColor: palette.background,
   },
-  container: {
+  scroll: {
     flexGrow: 1,
-    justifyContent: 'center',
-    gap: 12,
-    padding: 24,
+  },
+  hero: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl * 2.5,
+    backgroundColor: palette.primary,
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
+  },
+  // O wrapper dá a margem lateral; o cartão ocupa a largura restante
+  // (até 440px em telas largas, centralizado).
+  cardWrapper: {
+    alignItems: 'center',
+    marginTop: -spacing.xl * 1.5,
+    paddingHorizontal: spacing.md,
+  },
+  card: {
+    gap: spacing.md,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    backgroundColor: palette.surface,
+    shadowColor: palette.primaryDark,
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
+    width: '100%',
+    maxWidth: 440,
   },
   title: {
-    color: '#17324d',
+    color: palette.text,
     fontWeight: '700',
   },
   subtitle: {
-    color: '#526579',
-    marginBottom: 8,
+    color: palette.textMuted,
+    marginTop: -spacing.sm,
+    marginBottom: spacing.xs,
   },
   notice: {
-    color: '#8a5a00',
-    backgroundColor: '#fff4e0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: radius.md,
+    backgroundColor: palette.warningSoft,
+  },
+  noticeText: {
+    flex: 1,
+    color: palette.warning,
+  },
+  inputOutline: {
+    borderRadius: radius.md,
+  },
+  error: {
+    marginTop: -spacing.sm,
+    paddingHorizontal: 0,
+  },
+  button: {
+    marginTop: spacing.xs,
+    borderRadius: radius.md,
+  },
+  buttonContent: {
+    height: 52,
+  },
+  buttonLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  footer: {
+    marginTop: 'auto',
+    paddingTop: spacing.xl,
+    textAlign: 'center',
+    color: palette.textMuted,
   },
 });
