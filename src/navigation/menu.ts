@@ -25,6 +25,20 @@ const perfil: MenuItem = {
   href: '/perfil',
 };
 
+const mural: MenuItem = {
+  title: 'Mural de comunicados',
+  description: 'Avisos do condomínio',
+  icon: 'bullhorn',
+  href: '/comunicados',
+};
+
+const ocorrencias: MenuItem = {
+  title: 'Ocorrências',
+  description: 'Problemas registrados no condomínio',
+  icon: 'clipboard-alert',
+  href: '/ocorrencias',
+};
+
 const sobre: MenuItem = {
   title: 'Sobre o projeto',
   description: 'Propósito do aplicativo',
@@ -51,6 +65,8 @@ export const MENU_POR_TIPO: Record<TipoUsuario, MenuItem[]> = {
       icon: 'home-city',
       href: '/unidades',
     },
+    mural,
+    ocorrencias,
     perfil,
     sobre,
     equipe,
@@ -62,9 +78,11 @@ export const MENU_POR_TIPO: Record<TipoUsuario, MenuItem[]> = {
       icon: 'office-building',
       href: '/condominios',
     },
+    mural,
+    ocorrencias,
     perfil,
     sobre,
     equipe,
   ],
-  ADMIN: [perfil, sobre, equipe],
+  ADMIN: [mural, ocorrencias, perfil, sobre, equipe],
 };
