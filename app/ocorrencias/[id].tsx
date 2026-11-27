@@ -417,7 +417,7 @@ export default function DetalhesOcorrenciaScreen() {
                 <Button
                   mode="outlined"
                   buttonColor="#b3261e"
-                  textColor="#b3261e"
+                  textColor="#fff"
                   icon="delete"
                   onPress={confirmarExclusao}
                   loading={excluirMutation.isPending}

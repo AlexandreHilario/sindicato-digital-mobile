@@ -39,6 +39,11 @@ type RegistrarOcorrenciaResponse = {
   ocorrencia: Ocorrencia;
 };
 
+type AtualizarOcorrenciaResponse = {
+  message: string;
+  ocorrencia: Ocorrencia;
+};
+
 export type AtualizarStatusInput = {
   status: StatusOcorrencia;
 };
@@ -57,24 +62,32 @@ export async function registrarOcorrencia(input: RegistrarOcorrenciaInput) {
 }
 
 export async function buscarOcorrencia(id: string | number) {
-  const { data } = await api.get<Ocorrencia>(`/ocorrencias/${id}`);
-  return data;
+  const { data } = await api.get<{ ocorrencia: Ocorrencia }>(
+    `/ocorrencias/${id}`,
+  );
+  return data.ocorrencia;
 }
 
 export async function atualizarOcorrencia(
   id: string | number,
   input: OcorrenciaInput,
 ) {
-  const { data } = await api.put<Ocorrencia>(`/ocorrencias/${id}`, input);
-  return data;
+  const { data } = await api.put<AtualizarOcorrenciaResponse>(
+    `/ocorrencias/${id}`,
+    input,
+  );
+  return data.ocorrencia;
 }
 
 export async function atualizarStatusOcorrencia(
   id: string | number,
   input: AtualizarStatusInput,
 ) {
-  const { data } = await api.put<Ocorrencia>(`/ocorrencias/${id}`, input);
-  return data;
+  const { data } = await api.put<AtualizarOcorrenciaResponse>(
+    `/ocorrencias/${id}`,
+    input,
+  );
+  return data.ocorrencia;
 }
 
 export async function excluirOcorrencia(id: string | number) {
