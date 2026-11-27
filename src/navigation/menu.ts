@@ -73,6 +73,13 @@ const vinculosSindicos: MenuItem = {
   href: '/sindicos/vinculos',
 };
 
+const gerenciarCondominios: MenuItem = {
+  title: 'Condomínios',
+  description: 'Cadastre e consulte os condomínios',
+  icon: 'office-building-outline',
+  href: '/gerenciar-condominios',
+};
+
 /**
  * Atalhos da tela inicial para cada tipo de conta. As abas inferiores ficam em
  * app/(app)/_layout.tsx e seguem as mesmas regras (Tabs.Protected).
@@ -104,6 +111,7 @@ export const MENU_POR_TIPO: Record<TipoUsuario, MenuItem[]> = {
     perfil,
   ],
   ADMIN: [
+    gerenciarCondominios,
     apartamentos,
     vinculosMoradores,
     vinculosSindicos,

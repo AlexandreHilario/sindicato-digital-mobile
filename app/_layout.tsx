@@ -72,6 +72,14 @@ export default function RootLayout() {
                 name="sindicos/meus-condominios"
                 options={{ ...stackHeader, title: 'Meus condomínios' }}
               />
+              <Stack.Screen
+                name="gerenciar-condominios/index"
+                options={{ ...stackHeader, title: 'Condomínios' }}
+              />
+              <Stack.Screen
+                name="gerenciar-condominios/formulario"
+                options={{ ...stackHeader, title: 'Novo condomínio' }}
+              />
               <Stack.Screen name="apartamentos/index" options={{ ...stackHeader, title: 'Apartamentos' }} />
               <Stack.Screen
                 name="apartamentos/formulario"
