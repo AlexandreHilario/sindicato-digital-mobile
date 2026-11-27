@@ -59,7 +59,7 @@ function MoradoresDaUnidade({ unidadeId }: { unidadeId: number }) {
       unidade.data &&
         condominios.data?.some(
         (condominio) =>
-          Number(condominio.id) === unidade.data?.condominio_id,
+          String(condominio.id) === String(unidade.data?.condominio_id),
         ),
     );
   const escopoVerificado =
