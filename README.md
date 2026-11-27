@@ -155,5 +155,13 @@ Nas telas, use `getErrorMessage(error)` para exibir o erro ao usuário.
 - Zustand com o estado da sessão e token salvo no `expo-secure-store`
 - React Native Paper como UI Kit
 
-Os integrantes e respectivos RAs devem ser adicionados ao README antes da
-entrega do projeto.
+## Integrantes
+
+| Nome | RA |
+| --- | --- |
+| Beatriz Sales Pagliani Correia da Cruz | 00000860053 |
+| Leticia Vitória Elias de Oliveira | 0000860050 |
+| Zarto Wagner de Andrade Junior | 00000859932 |
+| Alice da Silva Braz | 00000859878 |
+| Ana Clara Silva Brasil | 00000859933 |
+| Alexandre Vitor Hilario da Silva | 00000859885 |
