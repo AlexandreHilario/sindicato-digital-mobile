@@ -18,11 +18,11 @@ import {
   TextInput,
 } from 'react-native-paper';
 
-import { mensagemDeErro } from '../../src/services/comunicados';
 import {
   listarApartamentos,
   type Apartamento,
 } from '../../src/services/apartamentos';
+import { getErrorMessage } from '../../src/services/api-error';
 import {
   type TipoUsuario,
   type Usuario,
@@ -204,7 +204,7 @@ export default function UsuariosScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.message}>
-          {mensagemDeErro(sessao.error)}
+          {getErrorMessage(sessao.error)}
         </Text>
         <Button
           mode="contained"
@@ -243,7 +243,7 @@ export default function UsuariosScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.message}>
-          {mensagemDeErro(lista.error)}
+          {getErrorMessage(lista.error)}
         </Text>
         <Button
           mode="contained"
@@ -404,7 +404,7 @@ export default function UsuariosScreen() {
 
                   {apartamentos.isError && (
                     <Text style={styles.erro}>
-                      {mensagemDeErro(apartamentos.error)}
+                      {getErrorMessage(apartamentos.error)}
                     </Text>
                   )}
 
@@ -422,7 +422,7 @@ export default function UsuariosScreen() {
 
               {erroFormulario && (
                 <Text style={styles.erro}>
-                  {mensagemDeErro(erroFormulario)}
+                  {getErrorMessage(erroFormulario)}
                 </Text>
               )}
             </View>
@@ -507,7 +507,7 @@ export default function UsuariosScreen() {
 
             {exclusao.isError && (
               <Text style={styles.erro}>
-                {mensagemDeErro(exclusao.error)}
+                {getErrorMessage(exclusao.error)}
               </Text>
             )}
           </Dialog.Content>
