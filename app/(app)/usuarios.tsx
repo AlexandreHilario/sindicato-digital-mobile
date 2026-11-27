@@ -501,7 +501,8 @@ export default function UsuariosScreen() {
 
           <Dialog.Content>
             <Text>
-              {excluindo?.nome} será removido. Esta ação não pode ser
+              {excluindo?.nome} será removido, junto com os vínculos,
+              ocorrências e comunicados desta conta. Esta ação não pode ser
               desfeita.
             </Text>
 
