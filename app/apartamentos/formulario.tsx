@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, HelperText, Menu, Text, TextInput } from 'react-native-paper';
 
+import { SeletorComBusca } from '../../src/components/SeletorComBusca';
+import { listarTodosCondominios } from '../../src/services/condominios';
 import {
   atualizarApartamento,
   buscarApartamentoPorId,
@@ -126,6 +128,11 @@ function Formulario({ apartamento }: { apartamento?: Apartamento }) {
     queryKey: ['condominios-sindico'],
     queryFn: listarCondominiosDoSindico,
     enabled: sindico,
+  });
+  const todosCondominios = useQuery({
+    queryKey: ['condominios'],
+    queryFn: listarTodosCondominios,
+    enabled: !sindico,
   });
 
   const salvar = useMutation({
@@ -250,13 +257,15 @@ function Formulario({ apartamento }: { apartamento?: Apartamento }) {
         </View>
       ) : (
         <View>
-          <TextInput
-            label="ID do condomínio"
-            mode="outlined"
-            value={condominioIdTexto}
-            onChangeText={setCondominioIdTexto}
-            keyboardType="number-pad"
-            error={Boolean(erros.condominio_id)}
+          <SeletorComBusca
+            label="Condomínio"
+            opcoes={todosCondominios.data?.map((item) => ({
+              id: item.id,
+              titulo: item.nome,
+            })) ?? []}
+            valor={condominioIdTexto}
+            onSelecionar={(id) => setCondominioIdTexto(String(id))}
+            erro={Boolean(erros.condominio_id)}
           />
           <HelperText type="error" visible={Boolean(erros.condominio_id)}>
             {erros.condominio_id}

@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import {
   Button,
   Dialog,
@@ -8,62 +8,73 @@ import {
   Portal,
   Snackbar,
   Text,
-  TextInput,
 } from 'react-native-paper';
 
+import { SeletorComBusca } from '../../src/components/SeletorComBusca';
+import { listarTodosCondominios } from '../../src/services/condominios';
 import {
   associarSindico,
   desassociarSindico,
   mensagemDeErroSindico,
 } from '../../src/services/sindicos';
-import { useUsuarioLogado } from '../../src/services/usuario';
+import { listarUsuarios, useUsuarioLogado } from '../../src/services/usuario';
 
-function validarId(valor: string) {
-  const texto = valor.trim();
-  if (!/^\d+$/.test(texto)) {
-    return undefined;
-  }
-  const id = Number(texto);
-  return Number.isSafeInteger(id) && id > 0 ? id : undefined;
-}
+type Vinculo = {
+  sindicoId: number;
+  condominioId: number;
+};
 
 export default function VinculosSindicosScreen() {
   const queryClient = useQueryClient();
   const usuario = useUsuarioLogado();
-  const [sindicoIdTexto, setSindicoIdTexto] = useState('');
-  const [condominioIdTexto, setCondominioIdTexto] = useState('');
+  const [sindicoId, setSindicoId] = useState<string | number | null>(null);
+  const [condominioId, setCondominioId] = useState<string | number | null>(
+    null,
+  );
   const [erroSindicoId, setErroSindicoId] = useState('');
   const [erroCondominioId, setErroCondominioId] = useState('');
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
-  const [vinculoRemocao, setVinculoRemocao] = useState<{
-    sindicoId: number;
-    condominioId: number;
-  } | null>(null);
+  const [vinculoRemocao, setVinculoRemocao] = useState<Vinculo | null>(null);
   const [sucesso, setSucesso] = useState('');
   const administrador = usuario.data?.tipo === 'ADMIN';
+
+  const usuarios = useQuery({
+    queryKey: ['usuarios'],
+    queryFn: listarUsuarios,
+    enabled: administrador,
+  });
+  const condominios = useQuery({
+    queryKey: ['condominios'],
+    queryFn: listarTodosCondominios,
+    enabled: administrador,
+  });
+
+  const sindicos = usuarios.data?.filter((item) => item.tipo === 'SINDICO') ?? [];
+  const opcoesSindicos = sindicos.map((item) => ({
+    id: item.id,
+    titulo: item.nome,
+    subtitulo: item.email,
+  }));
+  const opcoesCondominios =
+    condominios.data?.map((item) => ({ id: item.id, titulo: item.nome })) ?? [];
+  const nomeDoSindico = (id: number) =>
+    sindicos.find((item) => Number(item.id) === id)?.nome ?? `ID ${id}`;
+  const nomeDoCondominio = (id: number) =>
+    condominios.data?.find((item) => Number(item.id) === id)?.nome ??
+    `ID ${id}`;
 
   const aoConcluir = async (mensagem: string) => {
     setSucesso(mensagem);
     await queryClient.invalidateQueries({ queryKey: ['meus-condominios'] });
   };
   const associacao = useMutation({
-    mutationFn: ({
-      sindicoId,
-      condominioId,
-    }: {
-      sindicoId: number;
-      condominioId: number;
-    }) => associarSindico(sindicoId, condominioId),
+    mutationFn: (vinculo: Vinculo) =>
+      associarSindico(vinculo.sindicoId, vinculo.condominioId),
     onSuccess: () => aoConcluir('Síndico associado ao condomínio.'),
   });
   const desassociacao = useMutation({
-    mutationFn: ({
-      sindicoId,
-      condominioId,
-    }: {
-      sindicoId: number;
-      condominioId: number;
-    }) => desassociarSindico(sindicoId, condominioId),
+    mutationFn: (vinculo: Vinculo) =>
+      desassociarSindico(vinculo.sindicoId, vinculo.condominioId),
     onSuccess: async () => {
       setConfirmacaoAberta(false);
       setVinculoRemocao(null);
@@ -71,21 +82,19 @@ export default function VinculosSindicosScreen() {
     },
   });
 
-  function lerIds() {
-    const sindicoId = validarId(sindicoIdTexto);
-    const condominioId = validarId(condominioIdTexto);
-    setErroSindicoId(sindicoId ? '' : 'Informe um ID de síndico positivo.');
-    setErroCondominioId(
-      condominioId ? '' : 'Informe um ID de condomínio positivo.',
-    );
-    return sindicoId && condominioId ? { sindicoId, condominioId } : undefined;
+  function lerVinculo(): Vinculo | undefined {
+    setErroSindicoId(sindicoId === null ? 'Selecione um síndico.' : '');
+    setErroCondominioId(condominioId === null ? 'Selecione um condomínio.' : '');
+    return sindicoId !== null && condominioId !== null
+      ? { sindicoId: Number(sindicoId), condominioId: Number(condominioId) }
+      : undefined;
   }
 
   function abrirConfirmacao() {
-    const ids = lerIds();
-    if (ids) {
+    const vinculo = lerVinculo();
+    if (vinculo) {
       desassociacao.reset();
-      setVinculoRemocao(ids);
+      setVinculoRemocao(vinculo);
       setConfirmacaoAberta(true);
     }
   }
@@ -122,39 +131,56 @@ export default function VinculosSindicosScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text variant="titleLarge">Gerenciar vínculos de síndicos</Text>
       <Text variant="bodyMedium" style={styles.description}>
-        Informe os IDs do síndico e do condomínio para associar ou remover o
+        Busque o síndico e o condomínio pelo nome para associar ou remover o
         vínculo. Não há uma consulta administrativa de vínculos disponível.
       </Text>
+      {(usuarios.isError || condominios.isError) && (
+        <>
+          <Text variant="bodyMedium" style={styles.message}>
+            Não foi possível carregar síndicos e condomínios.
+          </Text>
+          <Button
+            mode="contained"
+            onPress={() => {
+              usuarios.refetch();
+              condominios.refetch();
+            }}
+          >
+            Tentar novamente
+          </Button>
+        </>
+      )}
       <View>
-        <TextInput
-          label="ID do síndico"
-          mode="outlined"
-          value={sindicoIdTexto}
-          onChangeText={(value) => {
-            setSindicoIdTexto(value);
+        <SeletorComBusca
+          label="Síndico"
+          opcoes={opcoesSindicos}
+          valor={sindicoId}
+          onSelecionar={(id) => {
+            setSindicoId(id);
             setErroSindicoId('');
           }}
-          keyboardType="number-pad"
-          error={Boolean(erroSindicoId)}
+          erro={Boolean(erroSindicoId)}
         />
         <HelperText type="error" visible={Boolean(erroSindicoId)}>
           {erroSindicoId}
         </HelperText>
       </View>
       <View>
-        <TextInput
-          label="ID do condomínio"
-          mode="outlined"
-          value={condominioIdTexto}
-          onChangeText={(value) => {
-            setCondominioIdTexto(value);
+        <SeletorComBusca
+          label="Condomínio"
+          opcoes={opcoesCondominios}
+          valor={condominioId}
+          onSelecionar={(id) => {
+            setCondominioId(id);
             setErroCondominioId('');
           }}
-          keyboardType="number-pad"
-          error={Boolean(erroCondominioId)}
+          erro={Boolean(erroCondominioId)}
         />
         <HelperText type="error" visible={Boolean(erroCondominioId)}>
           {erroCondominioId}
@@ -168,9 +194,9 @@ export default function VinculosSindicosScreen() {
       <Button
         mode="contained"
         onPress={() => {
-          const ids = lerIds();
-          if (ids) {
-            associacao.mutate(ids);
+          const vinculo = lerVinculo();
+          if (vinculo) {
+            associacao.mutate(vinculo);
           }
         }}
         loading={associacao.isPending}
@@ -194,8 +220,10 @@ export default function VinculosSindicosScreen() {
           <Dialog.Title>Remover associação?</Dialog.Title>
           <Dialog.Content>
             <Text variant="bodyMedium">
-              Remover o vínculo do síndico {vinculoRemocao?.sindicoId} com o
-              condomínio {vinculoRemocao?.condominioId}?
+              Remover o vínculo do síndico{' '}
+              {vinculoRemocao && nomeDoSindico(vinculoRemocao.sindicoId)} com o
+              condomínio{' '}
+              {vinculoRemocao && nomeDoCondominio(vinculoRemocao.condominioId)}?
             </Text>
             {desassociacao.isError && (
               <HelperText type="error" visible>
@@ -235,13 +263,12 @@ export default function VinculosSindicosScreen() {
           {sucesso}
         </Snackbar>
       </Portal>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     gap: 12,
     padding: 24,
   },

@@ -104,7 +104,7 @@ export function validarApartamento(
       !Number.isInteger(Number(dados.condominio_id)) ||
       Number(dados.condominio_id) <= 0
     ) {
-      erros.condominio_id = 'Informe um ID de condomínio positivo.';
+      erros.condominio_id = 'Selecione um condomínio.';
     }
   }
 

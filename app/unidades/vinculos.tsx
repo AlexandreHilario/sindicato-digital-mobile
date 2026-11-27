@@ -1,28 +1,62 @@
+import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, HelperText, Text, TextInput } from 'react-native-paper';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Button, HelperText, Text } from 'react-native-paper';
 
+import { SeletorComBusca } from '../../src/components/SeletorComBusca';
+import { listarTodosCondominios } from '../../src/services/condominios';
+import { listarMeusCondominios } from '../../src/services/sindicos';
+import { listarUnidadesParaOcorrencia } from '../../src/services/unidades';
 import { podeGerenciar, useUsuarioLogado } from '../../src/services/usuario';
 
 export default function UnidadesScreen() {
   const usuario = useUsuarioLogado();
-  const [unidadeId, setUnidadeId] = useState('');
+  const [unidadeId, setUnidadeId] = useState<string | number | null>(null);
   const [erro, setErro] = useState('');
   const permitido = podeGerenciar(usuario.data);
+  const tipo = usuario.data?.tipo;
+
+  const unidades = useQuery({
+    queryKey: ['unidades-gestao', tipo],
+    queryFn: () => listarUnidadesParaOcorrencia(tipo as 'SINDICO' | 'ADMIN'),
+    enabled: permitido,
+  });
+  const condominios = useQuery({
+    queryKey: ['condominios-gestao', tipo],
+    queryFn: async () => {
+      const lista =
+        tipo === 'ADMIN'
+          ? await listarTodosCondominios()
+          : await listarMeusCondominios();
+      return lista.map((condominio) => ({
+        id: String(condominio.id),
+        nome: condominio.nome,
+      }));
+    },
+    enabled: permitido,
+  });
+
+  const nomesDosCondominios = new Map(
+    condominios.data?.map((condominio) => [condominio.id, condominio.nome]),
+  );
+  const opcoes =
+    unidades.data?.map((unidade) => ({
+      id: unidade.id,
+      titulo: `Bloco ${unidade.bloco} • Unidade ${unidade.numero}`,
+      subtitulo: nomesDosCondominios.get(String(unidade.condominio_id)),
+    })) ?? [];
 
   function abrirGerenciamento() {
-    const texto = unidadeId.trim();
-    const id = Number(texto);
-    if (!/^\d+$/.test(texto) || !Number.isSafeInteger(id) || id <= 0) {
-      setErro('Informe um ID de unidade positivo.');
+    if (unidadeId === null) {
+      setErro('Selecione uma unidade.');
       return;
     }
 
     setErro('');
     router.push({
       pathname: '/unidades/[unidadeId]/moradores',
-      params: { unidadeId: String(id) },
+      params: { unidadeId: String(unidadeId) },
     });
   }
 
@@ -52,36 +86,55 @@ export default function UnidadesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text variant="titleLarge">Gerenciar moradores de uma unidade</Text>
       <Text variant="bodyMedium" style={styles.description}>
-        Informe o ID da unidade para consultar e administrar os moradores
-        vinculados.
+        Busque a unidade pelo bloco, número ou condomínio para consultar e
+        administrar os moradores vinculados.
       </Text>
-      <TextInput
-        label="ID da unidade"
-        mode="outlined"
-        value={unidadeId}
-        onChangeText={(value) => {
-          setUnidadeId(value);
-          setErro('');
-        }}
-        keyboardType="number-pad"
-        error={Boolean(erro)}
-      />
-      <HelperText type="error" visible={Boolean(erro)}>
-        {erro}
-      </HelperText>
-      <Button mode="contained" onPress={abrirGerenciamento}>
-        Continuar
-      </Button>
-    </View>
+      {unidades.isError ? (
+        <>
+          <Text variant="bodyMedium" style={styles.message}>
+            Não foi possível carregar as unidades.
+          </Text>
+          <Button mode="contained" onPress={() => unidades.refetch()}>
+            Tentar novamente
+          </Button>
+        </>
+      ) : (
+        <>
+          <SeletorComBusca
+            label="Unidade"
+            opcoes={opcoes}
+            valor={unidadeId}
+            onSelecionar={(id) => {
+              setUnidadeId(id);
+              setErro('');
+            }}
+            erro={Boolean(erro)}
+          />
+          <HelperText type="error" visible={Boolean(erro)}>
+            {erro}
+          </HelperText>
+          <Button
+            mode="contained"
+            onPress={abrirGerenciamento}
+            loading={unidades.isPending}
+            disabled={unidades.isPending}
+          >
+            Continuar
+          </Button>
+        </>
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     gap: 12,
     padding: 24,
   },
