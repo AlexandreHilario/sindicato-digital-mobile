@@ -1,3 +1,4 @@
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, HelperText, Icon, Text, TextInput } from 'react-native-paper';
@@ -10,6 +11,8 @@ import { palette, radius, spacing } from '../src/theme';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { cadastro } = useLocalSearchParams<{ cadastro?: string }>();
   const signIn = useSessionStore((state) => state.signIn);
   const notice = useSessionStore((state) => state.notice);
   const clearNotice = useSessionStore((state) => state.clearNotice);
@@ -61,6 +64,16 @@ export default function LoginScreen() {
           </Text>
 
           <ConnectionBanner />
+
+          {cadastro === 'sucesso' ? (
+            <View style={styles.success}>
+              <Icon source="check-circle-outline" size={20} color={palette.primary} />
+              <Text variant="bodyMedium" style={styles.successText}>
+                Conta criada. Entre com seu e-mail e senha. Se nenhuma unidade estiver
+                vinculada, solicite o vínculo à administração do condomínio.
+              </Text>
+            </View>
+          ) : null}
 
           {notice ? (
             <View style={styles.notice}>
@@ -125,6 +138,10 @@ export default function LoginScreen() {
             labelStyle={styles.buttonLabel}
           >
             Entrar
+          </Button>
+
+          <Button mode="text" onPress={() => router.push('/cadastro')} disabled={submitting}>
+            Criar conta
           </Button>
         </View>
         </View>
@@ -193,6 +210,18 @@ const styles = StyleSheet.create({
   noticeText: {
     flex: 1,
     color: palette.warning,
+  },
+  success: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    padding: 12,
+    borderRadius: radius.md,
+    backgroundColor: palette.primarySoft,
+  },
+  successText: {
+    flex: 1,
+    color: palette.primary,
   },
   inputOutline: {
     borderRadius: radius.md,

@@ -25,6 +25,16 @@ export async function login(email: string, senha: string): Promise<LoginResponse
   return data;
 }
 
+/** POST /auth/signup — cria um MORADOR (201, sem token). */
+export async function signup(nome: string, email: string, senha: string): Promise<Usuario> {
+  const { data } = await api.post<Usuario>('/auth/signup', {
+    nome: nome.trim(),
+    email: email.trim().toLowerCase(),
+    senha,
+  });
+  return data;
+}
+
 /** GET /auth/me — devolve o usuário dono do token. */
 export async function getMe(token: string): Promise<Usuario> {
   const { data } = await api.get<Usuario>('/auth/me', {

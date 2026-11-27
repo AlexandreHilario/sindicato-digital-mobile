@@ -82,6 +82,7 @@ export default function RootLayout() {
             {/* Quem não está logado só acessa o login */}
             <Stack.Protected guard={status === 'unauthenticated'}>
               <Stack.Screen name="login" />
+              <Stack.Screen name="cadastro" />
             </Stack.Protected>
           </Stack>
         )}
