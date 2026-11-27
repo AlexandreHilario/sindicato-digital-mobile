@@ -160,7 +160,7 @@ Nas telas, use `getErrorMessage(error)` para exibir o erro ao usuário.
 | Nome | RA |
 | --- | --- |
 | Beatriz Sales Pagliani Correia da Cruz | 00000860053 |
-| Leticia Vitória Elias de Oliveira | 0000860050 |
+| Leticia Vitória Elias de Oliveira | 00000860050 |
 | Zarto Wagner de Andrade Junior | 00000859932 |
 | Alice da Silva Braz | 00000859878 |
 | Ana Clara Silva Brasil | 00000859933 |
