@@ -54,6 +54,7 @@ export default function UsuariosScreen() {
   const [senha, setSenha] = useState('');
   const [tipo, setTipo] = useState<TipoUsuario>('MORADOR');
   const [unidadeId, setUnidadeId] = useState('');
+  const [erroValidacao, setErroValidacao] = useState('');
 
   const lista = useQuery<Usuario[]>({
     queryKey: ['usuarios'],
@@ -105,6 +106,7 @@ export default function UsuariosScreen() {
     setTipo('MORADOR');
     setUnidadeId('');
     setEditando(null);
+    setErroValidacao('');
     cadastro.reset();
     edicao.reset();
   }
@@ -131,7 +133,20 @@ export default function UsuariosScreen() {
     const nomeLimpo = nome.trim();
     const emailLimpo = email.trim();
 
-    if (nomeLimpo.length < 2 || !emailLimpo.includes('@')) {
+    setErroValidacao('');
+
+    if (nomeLimpo.length < 2) {
+      setErroValidacao('O nome deve ter ao menos 2 caracteres.');
+      return;
+    }
+
+    if (!emailLimpo.includes('@')) {
+      setErroValidacao('Informe um e-mail válido.');
+      return;
+    }
+
+    if (senha && senha.length < 6) {
+      setErroValidacao('A senha deve ter ao menos 6 caracteres.');
       return;
     }
 
@@ -147,8 +162,15 @@ export default function UsuariosScreen() {
       return;
     }
 
-    if (senha.length < 6) return;
-    if (tipo === 'MORADOR' && !unidadeId) return;
+    if (!senha) {
+      setErroValidacao('Informe uma senha.');
+      return;
+    }
+
+    if (tipo === 'MORADOR' && !unidadeId) {
+      setErroValidacao('Selecione um apartamento.');
+      return;
+    }
 
     cadastro.mutate({
       nome: nomeLimpo,
@@ -392,6 +414,10 @@ export default function UsuariosScreen() {
                     </Text>
                   )}
                 </>
+              )}
+
+              {erroValidacao !== '' && (
+                <Text style={styles.erro}>{erroValidacao}</Text>
               )}
 
               {erroFormulario && (
